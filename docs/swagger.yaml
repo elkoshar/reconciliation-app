@@ -1,0 +1,12 @@
+basePath: /reconciliation/
+info:
+  contact:
+    email: elko.s.eppasa@gmail.com
+    name: Elko Sharhadi Eppasa
+    url: https://github.com/elkoshar/reconciliation-app
+  description: This service is to handle Reconciliation App. For more detail, please
+    visit https://github.com/elkoshar/reconciliation-app
+  title: RECONCILIATION APP API
+  version: "0.1"
+paths: {}
+swagger: "2.0"
