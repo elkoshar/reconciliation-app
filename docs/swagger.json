@@ -10,6 +10,206 @@
         },
         "version": "0.1"
     },
-    "basePath": "/reconciliation/",
-    "paths": {}
+    "basePath": "/reconciliation-app/",
+    "paths": {
+        "/reconciliation": {
+            "post": {
+                "description": "Reconciliation handles request for reconciliation process",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reconciliation"
+                ],
+                "summary": "Reconciliation Process",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "id",
+                        "description": "accept language",
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2023-01-01",
+                        "description": "start date format YYYY-MM-DD",
+                        "name": "start_date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2023-01-31",
+                        "description": "end date format YYYY-MM-DD",
+                        "name": "end_date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "system data file upload",
+                        "name": "system_data",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "attachment file upload",
+                        "name": "attachment",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.ReconciliationResult"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "InternalServerError"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_elkoshar_reconciliation-app_pkg_response.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "application error code for tracing",
+                    "type": "integer",
+                    "example": 0
+                },
+                "msg": {
+                    "description": "error message",
+                    "type": "string",
+                    "example": " "
+                },
+                "status": {
+                    "description": "true if we have error",
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "github_com_elkoshar_reconciliation-app_pkg_response.Response": {
+            "type": "object",
+            "properties": {
+                "code": {},
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_pkg_response.Error"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pagination": {},
+                "serverTime": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_elkoshar_reconciliation-app_service_reconciliation.BankTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "bankName": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "uniqueID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_elkoshar_reconciliation-app_service_reconciliation.ReconciliationResult": {
+            "type": "object",
+            "properties": {
+                "totalDiscrepancies": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "totalMatched": {
+                    "type": "integer"
+                },
+                "totalProcessed": {
+                    "type": "integer"
+                },
+                "totalUnmatched": {
+                    "type": "integer"
+                },
+                "unmatchedBank": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.BankTransaction"
+                        }
+                    }
+                },
+                "unmatchedSystem": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.SystemTransaction"
+                    }
+                }
+            }
+        },
+        "github_com_elkoshar_reconciliation-app_service_reconciliation.SystemTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "transactionID": {
+                    "type": "string"
+                },
+                "transactionTime": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.TransactionType"
+                }
+            }
+        },
+        "github_com_elkoshar_reconciliation-app_service_reconciliation.TransactionType": {
+            "type": "string",
+            "enum": [
+                "DEBIT",
+                "CREDIT"
+            ],
+            "x-enum-varnames": [
+                "Debit",
+                "Credit"
+            ]
+        }
+    }
 }

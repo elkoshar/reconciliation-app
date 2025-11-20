@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/elkoshar/reconciliation-app/api"
+	"github.com/elkoshar/reconciliation-app/api/http/reconciliation"
 	config "github.com/elkoshar/reconciliation-app/configs"
 	"github.com/elkoshar/reconciliation-app/pkg/helpers"
 	"github.com/elkoshar/reconciliation-app/pkg/logger"
@@ -68,6 +69,7 @@ func handler(cfg *config.Config) http.Handler {
 			r.Use(api.NewMetricMiddleware())
 			// reconciliation group
 			r.Route("/reconciliation", func(r chi.Router) {
+				r.Post("/", reconciliation.Reconciliation)
 			})
 
 		})

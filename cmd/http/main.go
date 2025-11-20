@@ -18,7 +18,7 @@ import (
 // @contact.name Elko Sharhadi Eppasa
 // @contact.url https://github.com/elkoshar/reconciliation-app
 // @contact.email elko.s.eppasa@gmail.com
-// @BasePath /reconciliation/
+// @BasePath /reconciliation-app/
 func main() {
 
 	var (
@@ -43,11 +43,6 @@ func main() {
 	panics.SetOptions(&panics.Options{
 		Env: helpers.GetEnvString(),
 	})
-
-	fmt.Println("Starting Reconciliation App Service...")
-	fmt.Printf("Environment: %s\n", helpers.GetEnvString())
-	fmt.Printf("HTTP Server Port: %d\n", cfg.ServerHttpPort)
-	fmt.Printf("Config: %v", cfg)
 
 	// init all DI for service handler implementation
 	if err := server.InitHttp(cfg); err != nil {

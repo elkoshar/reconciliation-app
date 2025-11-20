@@ -1,4 +1,86 @@
-basePath: /reconciliation/
+basePath: /reconciliation-app/
+definitions:
+  github_com_elkoshar_reconciliation-app_pkg_response.Error:
+    properties:
+      code:
+        description: application error code for tracing
+        example: 0
+        type: integer
+      msg:
+        description: error message
+        example: ' '
+        type: string
+      status:
+        description: true if we have error
+        example: false
+        type: boolean
+    type: object
+  github_com_elkoshar_reconciliation-app_pkg_response.Response:
+    properties:
+      code: {}
+      data: {}
+      error:
+        $ref: '#/definitions/github_com_elkoshar_reconciliation-app_pkg_response.Error'
+      message:
+        type: string
+      pagination: {}
+      serverTime:
+        type: integer
+    type: object
+  github_com_elkoshar_reconciliation-app_service_reconciliation.BankTransaction:
+    properties:
+      amount:
+        format: int64
+        type: integer
+      bankName:
+        type: string
+      date:
+        type: string
+      uniqueID:
+        type: string
+    type: object
+  github_com_elkoshar_reconciliation-app_service_reconciliation.ReconciliationResult:
+    properties:
+      totalDiscrepancies:
+        format: int64
+        type: integer
+      totalMatched:
+        type: integer
+      totalProcessed:
+        type: integer
+      totalUnmatched:
+        type: integer
+      unmatchedBank:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.BankTransaction'
+          type: array
+        type: object
+      unmatchedSystem:
+        items:
+          $ref: '#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.SystemTransaction'
+        type: array
+    type: object
+  github_com_elkoshar_reconciliation-app_service_reconciliation.SystemTransaction:
+    properties:
+      amount:
+        format: int64
+        type: integer
+      transactionID:
+        type: string
+      transactionTime:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.TransactionType'
+    type: object
+  github_com_elkoshar_reconciliation-app_service_reconciliation.TransactionType:
+    enum:
+    - DEBIT
+    - CREDIT
+    type: string
+    x-enum-varnames:
+    - Debit
+    - Credit
 info:
   contact:
     email: elko.s.eppasa@gmail.com
@@ -8,5 +90,57 @@ info:
     visit https://github.com/elkoshar/reconciliation-app
   title: RECONCILIATION APP API
   version: "0.1"
-paths: {}
+paths:
+  /reconciliation:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Reconciliation handles request for reconciliation process
+      parameters:
+      - default: id
+        description: accept language
+        in: header
+        name: Accept-Language
+        required: true
+        type: string
+      - description: start date format YYYY-MM-DD
+        example: "2023-01-01"
+        in: formData
+        name: start_date
+        required: true
+        type: string
+      - description: end date format YYYY-MM-DD
+        example: "2023-01-31"
+        in: formData
+        name: end_date
+        required: true
+        type: string
+      - description: system data file upload
+        in: formData
+        name: system_data
+        required: true
+        type: file
+      - description: attachment file upload
+        in: formData
+        name: attachment
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success Response
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_elkoshar_reconciliation-app_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_elkoshar_reconciliation-app_service_reconciliation.ReconciliationResult'
+              type: object
+        "400":
+          description: Bad Request
+        "500":
+          description: InternalServerError
+      summary: Reconciliation Process
+      tags:
+      - Reconciliation
 swagger: "2.0"
