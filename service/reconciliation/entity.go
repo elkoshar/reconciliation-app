@@ -1,6 +1,9 @@
 package reconciliation
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type TransactionType string
 
@@ -9,7 +12,6 @@ const (
 	Credit TransactionType = "CREDIT"
 )
 
-// Money represents currency in cents to avoid float errors
 type Money int64
 
 func ToMoney(amount float64) Money {
@@ -41,4 +43,8 @@ type ReconciliationResult struct {
 	TotalDiscrepancies Money
 	UnmatchedSystem    []SystemTransaction
 	UnmatchedBank      map[string][]BankTransaction
+}
+
+func (m Money) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%.2f", m.ToFloat())), nil
 }

@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	TimeFormat = "2006-01-02 15:04:05"
+	SystemTimeFormat = "2006-01-02 15:04:05"
+	BankTimeFormat   = "2006-01-02"
 )
 
 type reconciliationService struct {
@@ -74,17 +75,15 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		key := generateKey(b.Date, b.Amount)
 		bankMap[key] = append(bankMap[key], i)
 	}
+	var stillUnmatchedSystem []SystemTransaction
 
 	fmt.Printf("\n\n bank transaction: %v\n\n", bankTransactions)
 
 	for _, sys := range systemTransactions {
+		sysDate := time.Date(sys.TransactionTime.Year(), sys.TransactionTime.Month(), sys.TransactionTime.Day(), 0, 0, 0, 0, time.UTC)
+		finalAmount := getSignedAmount(sys)
 
-		signedAmount := sys.Amount
-		if sys.Type == Debit {
-			signedAmount = -signedAmount
-		}
-
-		key := generateKey(sys.TransactionTime, signedAmount)
+		key := generateKey(sysDate, finalAmount)
 
 		indices, exists := bankMap[key]
 		matched := false
@@ -102,6 +101,47 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		}
 
 		if !matched {
+			// result.UnmatchedSystem = append(result.UnmatchedSystem, sys)
+			stillUnmatchedSystem = append(stillUnmatchedSystem, sys)
+		}
+	}
+
+	bankMapByDate := make(map[string][]int)
+	for i, b := range bankTransactions {
+		if !matchedBanks[i] {
+			dKey := b.Date.Format("2006-01-02")
+			bankMapByDate[dKey] = append(bankMapByDate[dKey], i)
+		}
+	}
+
+	for _, sys := range stillUnmatchedSystem {
+		sysDateKey := sys.TransactionTime.Format("2006-01-02")
+		foundDiscrepancy := false
+
+		if indices, exists := bankMapByDate[sysDateKey]; exists {
+			for _, idx := range indices {
+				if !matchedBanks[idx] {
+					bankTrx := bankTransactions[idx]
+					sysSignedAmount := getSignedAmount(sys)
+
+					diff := sysSignedAmount - bankTrx.Amount
+					if diff < 0 {
+						diff = -diff
+					}
+
+					fmt.Printf("[Discrepancy] Date: %s | SysID: %s | Diff: %.2f",
+						sysDateKey, sys.TransactionID, diff.ToFloat())
+
+					result.TotalDiscrepancies += diff
+					result.TotalMatched++
+					matchedBanks[idx] = true
+					foundDiscrepancy = true
+					break
+				}
+			}
+		}
+
+		if !foundDiscrepancy {
 			result.UnmatchedSystem = append(result.UnmatchedSystem, sys)
 		}
 	}
@@ -116,8 +156,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 	for _, v := range result.UnmatchedBank {
 		result.TotalUnmatched += len(v)
 	}
-
-	result.TotalDiscrepancies = 0
 
 	return
 }
@@ -143,7 +181,7 @@ func LoadSystemTransactions(r io.Reader, start, end time.Time) ([]SystemTransact
 			continue
 		}
 
-		tTime, _ := time.Parse(TimeFormat, record[3])
+		tTime, _ := time.Parse(SystemTimeFormat, record[3])
 
 		if tTime.Before(start) || tTime.After(end) {
 			continue
@@ -178,7 +216,7 @@ func LoadBankStatement(r io.Reader, bankName string, start, end time.Time) ([]Ba
 			break
 		}
 
-		dTime, _ := time.Parse(TimeFormat, record[2])
+		dTime, _ := time.Parse(BankTimeFormat, record[2])
 
 		if dTime.Before(start) || dTime.After(end) {
 			continue
@@ -199,4 +237,18 @@ func LoadBankStatement(r io.Reader, bankName string, start, end time.Time) ([]Ba
 func generateKey(date time.Time, amount Money) string {
 	// Format: YYYY-MM-DD hh:mm-amount
 	return fmt.Sprintf("%s-%d", date.Format("2006-01-02 15:04"), amount)
+}
+
+func getSignedAmount(sys SystemTransaction) Money {
+	rawAmount := sys.Amount
+	if rawAmount < 0 {
+		rawAmount = -rawAmount
+	}
+
+	cleanType := strings.ToUpper(strings.TrimSpace(string(sys.Type)))
+
+	if cleanType == "DEBIT" {
+		return -rawAmount
+	}
+	return rawAmount
 }
