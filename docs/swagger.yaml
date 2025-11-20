@@ -124,6 +124,22 @@ paths:
         in: formData
         name: bank_csv
         type: file
+      - description: bank CSV file upload
+        in: formData
+        name: bank_csv
+        type: file
+      - description: bank CSV file upload
+        in: formData
+        name: bank_csv
+        type: file
+      - description: bank CSV file upload
+        in: formData
+        name: bank_csv
+        type: file
+      - description: bank CSV file upload
+        in: formData
+        name: bank_csv
+        type: file
       produces:
       - application/json
       responses:

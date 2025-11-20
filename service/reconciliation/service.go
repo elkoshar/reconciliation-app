@@ -75,6 +75,8 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		bankMap[key] = append(bankMap[key], i)
 	}
 
+	fmt.Printf("\n\n bank transaction: %v\n\n", bankTransactions)
+
 	for _, sys := range systemTransactions {
 
 		signedAmount := sys.Amount

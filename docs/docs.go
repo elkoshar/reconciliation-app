@@ -69,6 +69,30 @@ const docTemplate = `{
                         "description": "bank CSV file upload",
                         "name": "bank_csv",
                         "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "bank CSV file upload",
+                        "name": "bank_csv",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "bank CSV file upload",
+                        "name": "bank_csv",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "bank CSV file upload",
+                        "name": "bank_csv",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "bank CSV file upload",
+                        "name": "bank_csv",
+                        "in": "formData"
                     }
                 ],
                 "responses": {

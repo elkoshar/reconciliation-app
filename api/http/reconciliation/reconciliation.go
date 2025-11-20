@@ -35,6 +35,10 @@ func Init(service api.ReconciliationService) {
 // @Param end_date formData string true "end date format YYYY-MM-DD" example(2023-01-31)
 // @Param system_data formData file true "system data file upload"
 // @Param bank_csv formData file false "bank CSV file upload"
+// @Param bank_csv formData file false "bank CSV file upload"
+// @Param bank_csv formData file false "bank CSV file upload"
+// @Param bank_csv formData file false "bank CSV file upload"
+// @Param bank_csv formData file false "bank CSV file upload"
 // @Success 200 {object} response.Response{data=reconciliation.ReconciliationResult} "Success Response"
 // @Failure 400 "Bad Request"
 // @Failure 500 "InternalServerError"
