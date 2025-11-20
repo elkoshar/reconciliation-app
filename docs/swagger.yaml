@@ -120,9 +120,9 @@ paths:
         name: system_data
         required: true
         type: file
-      - description: attachment file upload
+      - description: bank CSV file upload
         in: formData
-        name: attachment
+        name: bank_csv
         type: file
       produces:
       - application/json

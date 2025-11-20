@@ -31,7 +31,6 @@ func (s *reconciliationService) Reconcile(startDate string, endDate string, sysD
 	if err != nil {
 		return ReconciliationResult{}, fmt.Errorf("invalid start_date (expected YYYY-MM-DD)")
 	}
-	// Set end date to end of day
 	endTime, err := time.Parse("2006-01-02", endDate)
 	if err != nil {
 		return ReconciliationResult{}, fmt.Errorf("invalid end_date (expected YYYY-MM-DD)")
@@ -44,7 +43,6 @@ func (s *reconciliationService) Reconcile(startDate string, endDate string, sysD
 		return ReconciliationResult{}, fmt.Errorf("failed to load system transactions: %v", err)
 	}
 
-	// 4. Process Bank Files (Supports multiple files with same key "bank_csv")
 	var allBankTrx []BankTransaction
 
 	for _, fileHeader := range attachement.File["bank_csv"] {
@@ -54,7 +52,6 @@ func (s *reconciliationService) Reconcile(startDate string, endDate string, sysD
 		}
 		defer f.Close()
 
-		// Use filename as Bank Name
 		bankName := fmt.Sprintf("Stmt-%s", fileHeader.Filename)
 		bTrx, err := LoadBankStatement(f, bankName, startTime, endTime)
 		if err == nil {
@@ -70,10 +67,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		UnmatchedBank:  make(map[string][]BankTransaction),
 		TotalProcessed: len(systemTransactions) + len(bankTransactions),
 	}
-
-	// 1. Index Bank Transactions for O(1) lookup
-	// Key strategy: Since IDs don't match, we key by "YYYY-MM-DD_AMOUNT"
-	// Value: Slice of indices to handle duplicate amounts on same day
 	bankMap := make(map[string][]int)
 	matchedBanks := make(map[int]bool)
 
@@ -82,34 +75,25 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		bankMap[key] = append(bankMap[key], i)
 	}
 
-	// 2. Iterate System Transactions to find matches
 	for _, sys := range systemTransactions {
-		// Normalize System Time to Date for comparison
-		sysDate := time.Date(sys.TransactionTime.Year(), sys.TransactionTime.Month(), sys.TransactionTime.Day(), 0, 0, 0, 0, time.UTC)
 
-		// Handle Sign: System usually has Type (DEBIT/CREDIT), Bank has signed Amount
-		// Assumption: System Credit (+), Debit (-). Adjust based on specific business rules.
 		signedAmount := sys.Amount
 		if sys.Type == Debit {
 			signedAmount = -signedAmount
 		}
 
-		key := generateKey(sysDate, signedAmount)
+		key := generateKey(sys.TransactionTime, signedAmount)
 
-		// Check match
 		indices, exists := bankMap[key]
 		matched := false
 
 		if exists {
-			// Find the first unused bank transaction in this bucket
 			for _, idx := range indices {
 				if !matchedBanks[idx] {
 					matchedBanks[idx] = true
 					matched = true
 					result.TotalMatched++
 
-					// Check for discrepancy (If we matched by ID, we would calc diff here.
-					// Since we matched by Amount, discrepancy is 0).
 					break
 				}
 			}
@@ -120,7 +104,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		}
 	}
 
-	// 3. Collect Unmatched Bank Transactions
 	for i, b := range bankTransactions {
 		if !matchedBanks[i] {
 			result.UnmatchedBank[b.BankName] = append(result.UnmatchedBank[b.BankName], b)
@@ -132,9 +115,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		result.TotalUnmatched += len(v)
 	}
 
-	// Note: TotalDiscrepancies calculation requires a shared ID.
-	// If we implemented a "Fuzzy Match" (Same Date, Different Amount), we would add it here.
-	// For this strict implementation, Discrepancy is 0.
 	result.TotalDiscrepancies = 0
 
 	return
@@ -142,6 +122,8 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 
 func LoadSystemTransactions(r io.Reader, start, end time.Time) ([]SystemTransaction, error) {
 	csvReader := csv.NewReader(r)
+
+	csvReader.TrimLeadingSpace = true
 
 	// Skip header
 	if _, err := csvReader.Read(); err != nil {
@@ -180,7 +162,8 @@ func LoadSystemTransactions(r io.Reader, start, end time.Time) ([]SystemTransact
 func LoadBankStatement(r io.Reader, bankName string, start, end time.Time) ([]BankTransaction, error) {
 	csvReader := csv.NewReader(r)
 
-	// Skip header
+	csvReader.TrimLeadingSpace = true
+
 	if _, err := csvReader.Read(); err != nil {
 		return nil, err
 	}

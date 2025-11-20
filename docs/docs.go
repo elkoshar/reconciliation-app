@@ -66,8 +66,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "attachment file upload",
-                        "name": "attachment",
+                        "description": "bank CSV file upload",
+                        "name": "bank_csv",
                         "in": "formData"
                     }
                 ],

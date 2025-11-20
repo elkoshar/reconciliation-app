@@ -34,7 +34,7 @@ func Init(service api.ReconciliationService) {
 // @Param start_date formData string true "start date format YYYY-MM-DD" example(2023-01-01)
 // @Param end_date formData string true "end date format YYYY-MM-DD" example(2023-01-31)
 // @Param system_data formData file true "system data file upload"
-// @Param attachment formData file false "attachment file upload"
+// @Param bank_csv formData file false "bank CSV file upload"
 // @Success 200 {object} response.Response{data=reconciliation.ReconciliationResult} "Success Response"
 // @Failure 400 "Bad Request"
 // @Failure 500 "InternalServerError"
@@ -48,7 +48,7 @@ func Reconciliation(w http.ResponseWriter, r *http.Request) {
 		result reconciliation.ReconciliationResult
 	)
 
-	err = r.ParseMultipartForm(32 << 20) // limit your max input length!
+	err = r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		slog.WarnContext(r.Context(), fmt.Sprintf("Parse Multipart Form Failed. err=%v", err))
 		resp.SetError(err, http.StatusBadRequest)
