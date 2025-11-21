@@ -267,14 +267,6 @@ go test ./... -v
 - Concurrent bank file processing: Supported
 - Memory usage scales with file size
 
-## Security
-
-- Input validation for all form fields
-- CSV injection protection
-- Request size limits
-- Error message sanitization
-- No sensitive data logging
-
 ## Contributors
 
 @elkoshar
