@@ -77,8 +77,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 	}
 	var stillUnmatchedSystem []SystemTransaction
 
-	fmt.Printf("\n\n bank transaction: %v\n\n", bankTransactions)
-
 	for _, sys := range systemTransactions {
 		sysDate := time.Date(sys.TransactionTime.Year(), sys.TransactionTime.Month(), sys.TransactionTime.Day(), 0, 0, 0, 0, time.UTC)
 		finalAmount := getSignedAmount(sys)
@@ -101,7 +99,6 @@ func reconcileProcess(systemTransactions []SystemTransaction, bankTransactions [
 		}
 
 		if !matched {
-			// result.UnmatchedSystem = append(result.UnmatchedSystem, sys)
 			stillUnmatchedSystem = append(stillUnmatchedSystem, sys)
 		}
 	}
