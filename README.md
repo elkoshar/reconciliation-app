@@ -78,7 +78,6 @@ http://localhost:8080/swagger/index.html
 
 ## Testing the Application
 
-
 ### API Testing with cURL
 
 **Endpoint:** `POST /reconciliation-app/reconciliation`
@@ -251,7 +250,7 @@ make swag
 ```bash
 # Clean and reinstall dependencies
 go clean -modcache
-go mod download
+go mod vendor
 go mod tidy
 ```
 
