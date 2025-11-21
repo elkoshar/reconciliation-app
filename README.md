@@ -152,37 +152,102 @@ bca-03,-200000,2025-11-01
 
 ```json
 {
-  "data": {
-    "TotalProcessed": 10,
-    "TotalMatched": 8,
-    "TotalUnmatched": 2,
-    "TotalDiscrepancies": 150.50,
-    "UnmatchedSystem": [
-      {
-        "TransactionID": "TRX005",
-        "Amount": 75.25,
-        "Type": "CREDIT",
-        "TransactionTime": "2025-01-20T10:30:00Z"
-      }
-    ],
-    "UnmatchedBank": {
-      "BCA_Statement": [
-        {
-          "BankName": "BCA_Statement",
-          "UniqueID": "BANK010",
-          "Amount": 100.00,
-          "Date": "2025-01-25T00:00:00Z"
+    "data": {
+        "TotalProcessed": 56,
+        "TotalMatched": 22,
+        "TotalUnmatched": 12,
+        "TotalDiscrepancies": 5000.00,
+        "UnmatchedSystem": [
+            {
+                "TransactionID": "trx-sys-only-01",
+                "Amount": 11111.00,
+                "Type": "DEBIT",
+                "TransactionTime": "2025-11-20T08:00:00Z"
+            },
+            {
+                "TransactionID": "trx-sys-only-02",
+                "Amount": 22222.00,
+                "Type": "CREDIT",
+                "TransactionTime": "2025-11-21T08:00:00Z"
+            },
+            {
+                "TransactionID": "trx-sys-only-03",
+                "Amount": 33333.00,
+                "Type": "DEBIT",
+                "TransactionTime": "2025-11-22T08:00:00Z"
+            }
+        ],
+        "UnmatchedBank": {
+            "Stmt-BCA_Statement - Sheet1.csv": [
+                {
+                    "BankName": "Stmt-BCA_Statement - Sheet1.csv",
+                    "UniqueID": "bca-08",
+                    "Amount": -100.00,
+                    "Date": "2025-11-01T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-BCA_Statement - Sheet1.csv",
+                    "UniqueID": "bca-09",
+                    "Amount": -200.00,
+                    "Date": "2025-11-01T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-BCA_Statement - Sheet1.csv",
+                    "UniqueID": "bca-10",
+                    "Amount": 300.00,
+                    "Date": "2025-11-01T00:00:00Z"
+                }
+            ],
+            "Stmt-BRI_Statement - Sheet1.csv": [
+                {
+                    "BankName": "Stmt-BRI_Statement - Sheet1.csv",
+                    "UniqueID": "bri-08",
+                    "Amount": -500.00,
+                    "Date": "2025-11-03T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-BRI_Statement - Sheet1.csv",
+                    "UniqueID": "bri-09",
+                    "Amount": -600.00,
+                    "Date": "2025-11-03T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-BRI_Statement - Sheet1.csv",
+                    "UniqueID": "bri-10",
+                    "Amount": 700.00,
+                    "Date": "2025-11-03T00:00:00Z"
+                }
+            ],
+            "Stmt-Mandiri_Statement - Sheet1.csv": [
+                {
+                    "BankName": "Stmt-Mandiri_Statement - Sheet1.csv",
+                    "UniqueID": "man-08",
+                    "Amount": -10.00,
+                    "Date": "2025-11-02T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-Mandiri_Statement - Sheet1.csv",
+                    "UniqueID": "man-09",
+                    "Amount": 20.00,
+                    "Date": "2025-11-02T00:00:00Z"
+                },
+                {
+                    "BankName": "Stmt-Mandiri_Statement - Sheet1.csv",
+                    "UniqueID": "man-10",
+                    "Amount": 30.00,
+                    "Date": "2025-11-02T00:00:00Z"
+                }
+            ]
         }
-      ]
-    }
-  },
-  "error": {
-    "status": false,
-    "msg": "",
-    "code": 0
-  },
-  "message": "",
-  "serverTime": 1700000000
+    },
+    "error": {
+        "status": false,
+        "msg": "",
+        "code": 0
+    },
+    "message": "",
+    "serverTime": 1763739105,
+    "code": 200
 }
 ```
 
